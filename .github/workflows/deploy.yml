@@ -37,10 +37,3 @@ jobs:
           remote_host: ${{ vars.SSH_HOST }}
           remote_user: ${{ vars.SSH_USERNAME }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # Step 6: Restart FastAPI Application
-      - name: Restart FastAPI Application
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} << 'EOF'
-          supervisorctl restart fastapi
-          EOF
