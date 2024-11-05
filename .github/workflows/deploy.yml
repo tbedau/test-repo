@@ -25,7 +25,7 @@ jobs:
 
       # Step 4: Install the FastAPI app dependencies
       - name: Install FastAPI app dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --frozen --no-cache
 
       # Step 5: Deploy to Uberspace using Rsync
       - name: Deploy FastAPI app to Uberspace
