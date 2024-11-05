@@ -40,9 +40,9 @@ jobs:
 
       # Step 6: Restart FastAPI Application
       - name: Restart FastAPI Application
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} << 'EOF'
-          supervisorctl restart fastapi
-          EOF
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          ssh -i /tmp/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} "supervisorctl restart fastapi"
