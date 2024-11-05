@@ -1,27 +1,18 @@
-name: Example
-
+name: Deploy Website to Uberspace
 on:
-    push:
-      branches: [ main ]
-
-env:
-  UBERSPACE_HOST: ${{ secrets.UBERSPACE_HOST }}
-  UBERSPACE_USER: ${{ secrets.UBERSPACE_USER }}
-  APP_DIR: ~/fastapi_app
-
+  push:
+    branches: [main]
 jobs:
-  uv-example:
-    name: python
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-
-      - name: Set up Python
-        run: uv python install
-
-      - name: Install the project
-        run: uv sync --all-extras --dev
+      - name: Deploy using Rsync
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avrh --delete
+          path: /
+          remote_path: /var/www/virtual/${{ vars.SSH_USERNAME }}/html
+          remote_host: ${{ vars.SSH_HOST }}
+          remote_user: ${{ vars.SSH_USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
