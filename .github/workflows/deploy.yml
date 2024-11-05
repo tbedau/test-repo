@@ -16,24 +16,31 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:
-          enable-cache: true  # Enable caching to speed up installation on subsequent runs
-          version: "0.4.30"  # Pin to a specific version if needed
+          enable-cache: true
+          version: "0.4.30"
 
       # Step 3: Set up Python
       - name: Set up Python
-        run: uv python install  # This respects the Python version pinned in your project
+        run: uv python install
 
-      # Step 4: Install the FastAPI app and dependencies
+      # Step 4: Install the FastAPI app dependencies
       - name: Install FastAPI app dependencies
-        run: uv sync --all-extras --dev  # Install all project dependencies and development tools
+        run: uv sync --all-extras --dev
 
-      # Step 6: Deploy to Uberspace using Rsync
+      # Step 5: Deploy to Uberspace using Rsync
       - name: Deploy FastAPI app to Uberspace
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avrh --delete
           path: /
-          remote_path: /var/www/virtual/${{ vars.SSH_USERNAME }}/html  # Adjust remote path if needed
+          remote_path: /var/www/virtual/${{ vars.SSH_USERNAME }}/html
           remote_host: ${{ vars.SSH_HOST }}
           remote_user: ${{ vars.SSH_USERNAME }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Step 6: Restart FastAPI Application
+      - name: Restart FastAPI Application
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} << 'EOF'
+          supervisorctl restart fastapi
+          EOF
