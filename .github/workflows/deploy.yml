@@ -38,9 +38,11 @@ jobs:
           remote_user: ${{ vars.SSH_USERNAME }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Step 6: Restart FastAPI Application
-      - name: Restart FastAPI Application
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} "supervisorctl restart fastapi"
+      # Step 6: Restart FastAPI service
+      - name: Restart FastAPI service
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.SSH_HOST }}
+          username: ${{ vars.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: supervisorctl restart fastapi
